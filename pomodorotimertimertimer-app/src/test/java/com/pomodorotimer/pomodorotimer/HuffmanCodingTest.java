@@ -1,0 +1,96 @@
+package com.pomodorotimer.pomodorotimer;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Map;
+
+/**
+ * Unit tests for HuffmanCoding implementation.
+ * Tests file size reduction and lossless decompression.
+ */
+@DisplayName("Huffman Coding Tests")
+class HuffmanCodingTest {
+    
+    @Test
+    @DisplayName("Test encode and decode")
+    void testEncodeDecode() {
+        String text = "hello world";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        String encoded = huffman.encode(text);
+        String decoded = huffman.decode(encoded);
+        
+        assertEquals(text, decoded);
+    }
+    
+    @Test
+    @DisplayName("Test lossless decompression")
+    void testLosslessDecompression() {
+        String text = "aabbcc";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        String encoded = huffman.encode(text);
+        String decoded = huffman.decode(encoded);
+        
+        assertEquals(text, decoded);
+    }
+    
+    @Test
+    @DisplayName("Test compression ratio")
+    void testCompressionRatio() {
+        String text = "aaaaabbbbbccccc";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        String encoded = huffman.encode(text);
+        double ratio = huffman.getCompressionRatio(text, encoded);
+        
+        assertTrue(ratio > 1.0); // Should compress
+    }
+    
+    @Test
+    @DisplayName("Test encoding map")
+    void testEncodingMap() {
+        String text = "abc";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        Map<Character, String> encodingMap = huffman.getEncodingMap();
+        assertTrue(encodingMap.containsKey('a'));
+        assertTrue(encodingMap.containsKey('b'));
+        assertTrue(encodingMap.containsKey('c'));
+    }
+    
+    @Test
+    @DisplayName("Test empty text")
+    void testEmptyText() {
+        assertThrows(IllegalArgumentException.class, () -> new HuffmanCoding(""));
+        assertThrows(IllegalArgumentException.class, () -> new HuffmanCoding(null));
+    }
+    
+    @Test
+    @DisplayName("Test single character")
+    void testSingleCharacter() {
+        String text = "aaaaa";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        String encoded = huffman.encode(text);
+        String decoded = huffman.decode(encoded);
+        
+        assertEquals(text, decoded);
+    }
+    
+    @Test
+    @DisplayName("Test text compression use-case")
+    void testTextCompression() {
+        String text = "The quick brown fox jumps over the lazy dog";
+        HuffmanCoding huffman = new HuffmanCoding(text);
+        
+        String encoded = huffman.encode(text);
+        String decoded = huffman.decode(encoded);
+        
+        assertEquals(text, decoded);
+        assertTrue(encoded.length() < text.length() * 8); // Should compress
+    }
+}
+

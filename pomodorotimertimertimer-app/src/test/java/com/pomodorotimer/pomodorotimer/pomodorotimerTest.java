@@ -1,61 +1,41 @@
-package com.pomodorotimer.pomodorotimer; 
+package com.pomodorotimer.pomodorotimer;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
-@file pomodorotimerTest.java
-@brief This file contains the test cases for the pomodorotimer class.
-@details This file includes test methods to validate the functionality of the pomodorotimer class. It uses JUnit for unit testing.
-*/
-
-import static org.junit.Assert.*;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.pomodorotimer.pomodorotimer.pomodorotimer;
-
-/**
-
-@class pomodorotimerTest
-@brief This class represents the test class for the pomodorotimer class.
-@details The pomodorotimerTest class provides test methods to verify the behavior of the pomodorotimer class. It includes test methods for addition, subtraction, multiplication, and division operations.
-@author sumeyye_yetim23
-*/
+ * Test class for pomodorotimer.
+ * 
+ * @author sumeyye_yetim23
+ */
+@DisplayName("pomodorotimer Tests")
 public class pomodorotimerTest {
 
-  /**
-   * @brief This method is executed once before all test methods.
-   * @throws Exception
-   */
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
+    @BeforeAll
+    public static void setUpBeforeClass() throws Exception {
+    }
 
-  /**
-   * @brief This method is executed once after all test methods.
-   * @throws Exception
-   */
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-  }
+    @AfterAll
+    public static void tearDownAfterClass() throws Exception {
+    }
 
-  /**
-   * @brief This method is executed before each test method.
-   * @throws Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-  }
+    @BeforeEach
+    public void setUp() throws Exception {
+    }
 
-  /**
-   * @brief This method is executed after each test method.
-   * @throws Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-  }
+    @AfterEach
+    public void tearDown() throws Exception {
+    }
 
-
+    @Test
+    @DisplayName("Placeholder test")
+    public void placeholderTest() {
+        // Add test cases here
+        assertTrue(true);
+    }
 }
