@@ -15,6 +15,13 @@ package com.pomodorotimer.pomodorotimer;
 public class HeapSort {
     
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private HeapSort() {
+        // Utility class - no instantiation
+    }
+    
+    /**
      * Sorts an array using heap sort algorithm.
      * 
      * @param array the array to sort

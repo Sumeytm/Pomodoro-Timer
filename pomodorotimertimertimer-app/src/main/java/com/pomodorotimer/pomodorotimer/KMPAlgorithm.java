@@ -19,6 +19,13 @@ import java.util.List;
 public class KMPAlgorithm {
     
     /**
+     * Constructs a new KMPAlgorithm instance.
+     */
+    public KMPAlgorithm() {
+        // Default constructor
+    }
+    
+    /**
      * Finds all occurrences of pattern in text using KMP algorithm.
      * 
      * @param text the text to search in
