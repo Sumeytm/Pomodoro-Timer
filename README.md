@@ -17,7 +17,7 @@ This project contains Java implementations of 12 data structures and algorithms 
 - **sumeyye** - sumeyye_yetim23@erdogan.edu.tr
 - **selen** - selen_demirci23@erdogan.edu.tr
 - **sudenur** - sudenur_demir22@erdogan.edu.tr
-- **kaan** - RTEU
+- **kaan** - nazmikaan_erdogan22@erdogan.edu.tr
 
 ## Implementations
 
