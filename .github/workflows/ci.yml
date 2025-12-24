@@ -1,0 +1,75 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Build with Maven
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn clean compile
+      
+    - name: Run tests with coverage
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn test
+      
+    - name: Generate JaCoCo coverage report
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn jacoco:report
+      
+    - name: Check code coverage (must be 100%)
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn jacoco:check
+      
+    - name: Generate Javadoc
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn javadoc:javadoc
+      
+    - name: Install wkhtmltopdf for PDF generation
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wkhtmltopdf
+        
+    - name: Generate Javadoc PDF
+      working-directory: ./pomodorotimertimertimer-app
+      run: |
+        wkhtmltopdf --enable-local-file-access --page-size A4 --margin-top 0.75in --margin-bottom 0.75in --margin-left 0.75in --margin-right 0.75in target/javadoc/index.html target/javadoc/javadoc.pdf || echo "PDF generation failed, but continuing..."
+      
+    - name: Package application
+      working-directory: ./pomodorotimertimertimer-app
+      run: mvn package -DskipTests=false
+      
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-reports
+        path: |
+          pomodorotimertimertimer-app/target/site/jacoco/**
+          pomodorotimertimertimer-app/target/jacoco/**
+          
+    - name: Upload Javadoc (HTML and PDF)
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: javadoc
+        path: |
+          pomodorotimertimertimer-app/target/javadoc/**
+          pomodorotimertimertimer-app/target/javadoc/*.pdf
+

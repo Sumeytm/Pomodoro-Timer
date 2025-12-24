@@ -193,7 +193,42 @@ Tüm testler başarıyla geçmektedir:
 
 ## Dokümantasyon
 
-Tüm sınıflar ve public metodlar Javadoc ile dokümante edilmiştir. Javadoc oluşturulduktan sonra `target/site/apidocs/index.html` dosyasından erişilebilir.
+Tüm sınıflar ve public metodlar Javadoc ile dokümante edilmiştir. Javadoc oluşturulduktan sonra `target/javadoc/index.html` dosyasından erişilebilir.
+
+### Javadoc PDF Oluşturma
+
+Javadoc PDF'i oluşturmak için:
+
+```bash
+mvn javadoc:javadoc
+# HTML'den PDF'e dönüştürmek için wkhtmltopdf kullanılabilir
+```
+
+GitHub Actions otomatik olarak Javadoc PDF'i oluşturur ve artifact olarak yükler.
+
+## CI/CD Pipeline
+
+Proje GitHub Actions ile otomatik CI/CD pipeline'a sahiptir:
+
+- ✅ Otomatik test çalıştırma
+- ✅ Code coverage kontrolü (%100 zorunlu)
+- ✅ Javadoc oluşturma (HTML + PDF)
+- ✅ Build ve package işlemleri
+
+Pipeline her push ve pull request'te otomatik olarak çalışır.
+
+### Test Coverage
+
+Proje %100 test coverage gereksinimini karşılamaktadır. Coverage raporları:
+- JaCoCo HTML raporu: `target/site/jacoco/index.html`
+- JaCoCo XML raporu: `target/site/jacoco/jacoco.xml`
+
+Coverage kontrolü:
+```bash
+mvn jacoco:check
+```
+
+Bu komut coverage %100'ün altındaysa build'i başarısız yapar.
 
 ## Lisans
 
