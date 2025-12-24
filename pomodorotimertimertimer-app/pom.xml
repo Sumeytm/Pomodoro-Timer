@@ -35,6 +35,14 @@
 				<role>Developer</role>
 			</roles>
 		</developer>
+		<developer>
+			<name>kaan</name>
+			<organization>RTEU</organization>
+			<email>nazmikaan_erdogan22@erdogan.edu.tr</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 	<contributors>
 		<contributor>
@@ -45,14 +53,6 @@
 			    <role>Designer</role>
 		    </roles>
 		</contributor>
-			<contributor>
-			<name>kaan</name>
-			<organization>RTEU</organization>
-			<email>nazmikaan_erdogan22@erdogan.edu.tr</email>
-			<roles>
-				<role>Contributor</role>
-			</roles>
-	    </contributor>
 	</contributors>
 	<description>Maven Example Template Project</description>
 	<organization>
