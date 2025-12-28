@@ -27,8 +27,11 @@ jobs:
         echo "Building project..."
         mvn clean compile 2>&1 | tee build-output.log || {
           echo "❌ Build failed!"
-          echo "=== Last 100 lines of build output ==="
-          tail -100 build-output.log
+          echo "=== Last 200 lines of build output ==="
+          tail -200 build-output.log
+          echo ""
+          echo "=== Checking for compilation errors ==="
+          grep -i "error" build-output.log | tail -20
           exit 1
         }
         echo "✅ Build successful!"
@@ -38,19 +41,22 @@ jobs:
       working-directory: ./pomodorotimertimertimer-app
       run: |
         echo "Running tests..."
-        mvn test -X 2>&1 | tee test-output.log || {
+        mvn test 2>&1 | tee test-output.log || {
           echo "❌ Tests failed!"
           echo "=== Test Failure Details ==="
           if [ -d target/surefire-reports ]; then
             echo "Checking surefire reports..."
-            find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec cat {} \;
+            echo "=== All Test Reports ==="
+            find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec head -50 {} \;
             echo ""
             echo "=== Test XML Reports ==="
             find target/surefire-reports -name "*.xml" | head -5
+          else
+            echo "No surefire-reports directory found"
           fi
           echo ""
-          echo "=== Last 100 lines of test output ==="
-          tail -100 test-output.log
+          echo "=== Last 200 lines of test output ==="
+          tail -200 test-output.log
           exit 1
         }
         echo "✅ All tests passed!"
