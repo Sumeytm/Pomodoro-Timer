@@ -255,7 +255,11 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
         
         taskPanel.add(taskInputPanel, BorderLayout.SOUTH);
         
-        mainPanel.add(taskPanel, BorderLayout.EAST);
+        // Ana panel'e görev panelini ekle (timer ve butonların altına)
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(buttonPanel, BorderLayout.NORTH);
+        centerPanel.add(taskPanel, BorderLayout.CENTER);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
         
         // Alt panel - Faydalar ve Data Structures bilgisi
         JPanel benefitsPanel = new JPanel(new BorderLayout());
