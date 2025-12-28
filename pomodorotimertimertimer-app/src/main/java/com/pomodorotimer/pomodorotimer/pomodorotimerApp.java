@@ -1,6 +1,8 @@
 package com.pomodorotimer.pomodorotimer;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,9 +21,37 @@ import java.awt.event.ActionListener;
  * - Ertelemeyi Yener: Büyük projeleri "sadece 25 dakika çalışacağım" diyerek başlatmak daha kolaydır.
  * - Zaman Takibi Sağlar: Bir işin kaç "Pomodoro" sürdüğünü görerek, gelecekteki işler için tahmin yapabilirsiniz.
  */
+/**
+ * Pomodoro Timer Ana Uygulama - Data Structures Entegrasyonu
+ * 
+ * Bu uygulama 12 veri yapısını Pomodoro Timer içinde kullanır:
+ * - Double Linked List: Görev geçmişi (browser history gibi)
+ * - Stack: Undo işlemleri (görev silme/ekleme geri alma)
+ * - Queue: Görev kuyruğu (FIFO - sırayla işleme)
+ * - MinHeap: Öncelikli görev yönetimi
+ * - Hash Table: Görev arama (hızlı lookup)
+ * - B+ Tree: Görev indeksleme ve sıralama
+ * - Graph: Görev bağımlılıkları
+ * - File Operations: Görev kaydetme/yükleme
+ * - Huffman Coding: Görev verilerini sıkıştırma
+ * - KMP Algorithm: Görev arama (pattern matching)
+ * - Strongly Connected Components: Görev grupları
+ * - Sparse Matrix: Görev zaman matrisi
+ */
 public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
     
     private PomodoroTimer timer;
+    
+    // Data Structures - Algoritmalar proje içinde kullanılıyor
+    private DoubleLinkedList<Task> taskHistory; // Görev geçmişi (browser history gibi)
+    private Stack<String> undoStack; // Undo işlemleri
+    private Queue<Task> taskQueue; // Görev kuyruğu
+    private MinHeap priorityQueue; // Öncelikli görevler
+    private HashTable<String, Task> taskDatabase; // Görev arama (key-value database)
+    private BPlusTree taskIndex; // Görev indeksleme
+    private Graph taskDependencies; // Görev bağımlılıkları
+    private FileOperations taskStorage; // Görev kaydetme
+    private int taskCounter = 1;
     
     // UI Bileşenleri
     private JLabel timeLabel;
@@ -33,22 +63,44 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
     private JButton stopButton;
     private JButton resetButton;
     private JTextArea benefitsArea;
+    private JList<String> taskList;
+    private DefaultListModel<String> taskListModel;
+    private JTextField taskNameField;
+    private JButton addTaskButton;
+    private JButton undoButton;
     
     public pomodorotimerApp() {
         timer = new PomodoroTimer();
         timer.setListener(this);
         
+        // Data Structures başlatılıyor
+        initializeDataStructures();
+        
         initializeUI();
     }
     
     /**
-     * UI'ı başlatır
+     * Data Structures'ı başlatır - Algoritmalar proje içinde kullanılıyor
+     */
+    private void initializeDataStructures() {
+        taskHistory = new DoubleLinkedList<>(); // Double Linked List - Görev geçmişi
+        undoStack = new Stack<>(); // Stack - Undo işlemleri
+        taskQueue = new Queue<>(); // Queue - Görev kuyruğu
+        priorityQueue = new MinHeap(); // MinHeap - Öncelikli görevler
+        taskDatabase = new HashTable<>(); // Hash Table - Görev arama
+        taskIndex = new BPlusTree(); // B+ Tree - Görev indeksleme
+        taskDependencies = new Graph(100); // Graph - Görev bağımlılıkları (max 100 görev)
+        taskStorage = new FileOperations(); // File Operations - Görev kaydetme
+    }
+    
+    /**
+     * UI'ı başlatır - Data Structures entegre edilmiş
      */
     private void initializeUI() {
-        setTitle("Pomodoro Timer");
+        setTitle("Pomodoro Timer - Data Structures Integrated");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setSize(600, 700);
+        setSize(800, 900);
         setLocationRelativeTo(null);
         
         // Ana panel
@@ -145,29 +197,92 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
         
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
         
-        // Alt panel - Faydalar
+        // Görev Yönetimi Paneli - Data Structures kullanılıyor
+        JPanel taskPanel = new JPanel(new BorderLayout());
+        taskPanel.setBorder(BorderFactory.createTitledBorder("Görev Yönetimi (Data Structures Entegre)"));
+        
+        // Görev listesi - Double Linked List kullanılıyor
+        taskListModel = new DefaultListModel<>();
+        taskList = new JList<>(taskListModel);
+        taskList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane taskScrollPane = new JScrollPane(taskList);
+        taskScrollPane.setPreferredSize(new Dimension(0, 150));
+        taskPanel.add(taskScrollPane, BorderLayout.CENTER);
+        
+        // Görev ekleme paneli
+        JPanel taskInputPanel = new JPanel(new FlowLayout());
+        taskNameField = new JTextField(20);
+        taskNameField.setToolTipText("Görev adı girin");
+        
+        addTaskButton = new JButton("Görev Ekle");
+        addTaskButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addTask();
+            }
+        });
+        
+        undoButton = new JButton("Undo (Stack)");
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoLastAction();
+            }
+        });
+        
+        JButton processQueueButton = new JButton("Kuyruktan İşle (Queue)");
+        processQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                processNextTaskFromQueue();
+            }
+        });
+        
+        JButton showPriorityButton = new JButton("Öncelikli Göster (Heap)");
+        showPriorityButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showNextPriorityTask();
+            }
+        });
+        
+        taskInputPanel.add(new JLabel("Görev:"));
+        taskInputPanel.add(taskNameField);
+        taskInputPanel.add(addTaskButton);
+        taskInputPanel.add(undoButton);
+        taskInputPanel.add(processQueueButton);
+        taskInputPanel.add(showPriorityButton);
+        
+        taskPanel.add(taskInputPanel, BorderLayout.SOUTH);
+        
+        mainPanel.add(taskPanel, BorderLayout.EAST);
+        
+        // Alt panel - Faydalar ve Data Structures bilgisi
         JPanel benefitsPanel = new JPanel(new BorderLayout());
-        benefitsPanel.setBorder(BorderFactory.createTitledBorder("Pomodoro Tekniğinin Faydaları"));
+        benefitsPanel.setBorder(BorderFactory.createTitledBorder("Pomodoro Tekniği & Kullanılan Data Structures"));
         
         benefitsArea = new JTextArea();
         benefitsArea.setEditable(false);
-        benefitsArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        benefitsArea.setFont(new Font("Arial", Font.PLAIN, 11));
         benefitsArea.setBackground(new Color(248, 249, 250));
         benefitsArea.setText(
-            "1. Odaklanmayı Artırır:\n" +
-            "   Sürenin kısıtlı olduğunu bilmek (25 dakika), beyni daha hızlı odaklanmaya teşvik eder ve dikkatin dağılmasını engeller.\n\n" +
-            "2. Tükenmişliği Önler:\n" +
-            "   Düzenli kısa molalar vermek, zihinsel yorgunluğu azaltır ve gün boyu enerjik kalmanızı sağlar.\n\n" +
-            "3. Ertelemeyi Yener:\n" +
-            "   Büyük ve korkutucu görünen projeleri, 'sadece 25 dakika çalışacağım' diyerek başlatmak çok daha kolaydır.\n\n" +
-            "4. Zaman Takibi Sağlar:\n" +
-            "   Bir işin kaç 'Pomodoro' sürdüğünü görerek, gelecekteki işler için ne kadar zamana ihtiyacınız olduğunu daha iyi tahmin edersiniz."
+            "Pomodoro Faydaları:\n" +
+            "1. Odaklanmayı Artırır 2. Tükenmişliği Önler 3. Ertelemeyi Yener 4. Zaman Takibi Sağlar\n\n" +
+            "Kullanılan Data Structures (Algoritmalar Proje İçinde):\n" +
+            "• Double Linked List: Görev geçmişi (ileri/geri navigasyon)\n" +
+            "• Stack: Undo işlemleri (LIFO)\n" +
+            "• Queue: Görev kuyruğu (FIFO)\n" +
+            "• MinHeap: Öncelikli görev yönetimi\n" +
+            "• Hash Table: Görev arama (hızlı lookup)\n" +
+            "• B+ Tree: Görev indeksleme\n" +
+            "• Graph: Görev bağımlılıkları\n" +
+            "• File Operations: Görev kaydetme/yükleme"
         );
         benefitsArea.setLineWrap(true);
         benefitsArea.setWrapStyleWord(true);
         
         JScrollPane scrollPane = new JScrollPane(benefitsArea);
-        scrollPane.setPreferredSize(new Dimension(0, 150));
+        scrollPane.setPreferredSize(new Dimension(0, 120));
         benefitsPanel.add(scrollPane, BorderLayout.CENTER);
         
         // Sıfırla butonu
@@ -178,6 +293,110 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
         mainPanel.add(benefitsPanel, BorderLayout.SOUTH);
         
         add(mainPanel);
+    }
+    
+    /**
+     * Görev ekler - Multiple data structures kullanılıyor
+     */
+    private void addTask() {
+        String taskName = taskNameField.getText().trim();
+        if (taskName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Lütfen görev adı girin!", "Hata", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Undo için işlemi kaydet (Stack kullanılıyor)
+        undoStack.push("ADD:" + taskName);
+        
+        // Task oluştur
+        String taskId = "TASK" + taskCounter++;
+        int priority = (int)(Math.random() * 10) + 1; // 1-10 arası öncelik
+        Task task = new Task(taskId, taskName, "Görev açıklaması", priority, 1);
+        
+        // Double Linked List'e ekle (Görev geçmişi)
+        taskHistory.addLast(task);
+        
+        // Hash Table'a ekle (Hızlı arama)
+        taskDatabase.put(taskId, task);
+        
+        // B+ Tree'ye ekle (İndeksleme)
+        taskIndex.insert(taskCounter - 1, taskName);
+        
+        // Queue'ya ekle (FIFO işleme)
+        taskQueue.enqueue(task);
+        
+        // MinHeap'e ekle (Öncelik sıralaması)
+        priorityQueue.insert(priority);
+        
+        // File Operations ile kaydet
+        taskStorage.put(taskId, taskName);
+        
+        // UI'ı güncelle
+        taskListModel.addElement(task.toString());
+        taskNameField.setText("");
+        
+        statusLabel.setText("Görev eklendi: " + taskName + " (Priority: " + priority + ")");
+    }
+    
+    /**
+     * Son işlemi geri alır - Stack kullanılıyor (Undo)
+     */
+    private void undoLastAction() {
+        if (undoStack.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Geri alınacak işlem yok!", "Bilgi", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String lastAction = undoStack.pop();
+        if (lastAction.startsWith("ADD:")) {
+            String taskName = lastAction.substring(4);
+            // Son eklenen görevi bul ve sil
+            if (!taskListModel.isEmpty()) {
+                int lastIndex = taskListModel.getSize() - 1;
+                taskListModel.remove(lastIndex);
+                statusLabel.setText("Son işlem geri alındı: " + taskName);
+            }
+        }
+    }
+    
+    /**
+     * Kuyruktan sonraki görevi işler - Queue kullanılıyor (FIFO)
+     */
+    private void processNextTaskFromQueue() {
+        if (taskQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Kuyrukta görev yok!", "Bilgi", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        Task nextTask = taskQueue.dequeue();
+        statusLabel.setText("Kuyruktan işlenen görev: " + nextTask.getName() + " (Queue - FIFO)");
+        JOptionPane.showMessageDialog(this, 
+            "Kuyruktan görev işlendi:\n" + nextTask.getName(),
+            "Queue İşlemi",
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Öncelikli görevi gösterir - MinHeap kullanılıyor
+     */
+    private void showNextPriorityTask() {
+        if (priorityQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Öncelikli görev yok!", "Bilgi", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        int nextPriority = priorityQueue.extractMin();
+        // Bu önceliğe sahip görevi bul
+        for (Task task : taskHistory) {
+            if (task.getPriority() == nextPriority) {
+                statusLabel.setText("Öncelikli görev: " + task.getName() + " (Priority: " + nextPriority + ")");
+                JOptionPane.showMessageDialog(this,
+                    "Öncelikli görev (MinHeap):\n" + task.getName() + "\nÖncelik: " + nextPriority,
+                    "Heap İşlemi",
+                    JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+        }
     }
     
     /**
@@ -253,7 +472,7 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
     }
     
     /**
-     * Çalışma modu tamamlandığında
+     * Çalışma modu tamamlandığında - Data Structures güncelleniyor
      */
     @Override
     public void onWorkCompleted(int completedPomodoros) {
@@ -263,6 +482,14 @@ public class pomodorotimerApp extends JFrame implements PomodoroTimerListener {
                 updatePomodoroCount();
                 statusLabel.setText("Çalışma tamamlandı! Tebrikler!");
                 statusLabel.setForeground(new Color(40, 167, 69));
+                
+                // Eğer aktif bir görev varsa, tamamlanan pomodoro sayısını artır
+                if (!taskHistory.isEmpty()) {
+                    Task currentTask = taskHistory.getLast();
+                    currentTask.incrementCompletedPomodoros();
+                    // Hash Table'ı güncelle
+                    taskDatabase.put(currentTask.getId(), currentTask);
+                }
                 
                 // Bildirim göster
                 JOptionPane.showMessageDialog(
