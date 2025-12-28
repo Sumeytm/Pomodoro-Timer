@@ -28,22 +28,31 @@ jobs:
         mvn clean compile
         echo "✅ Build successful!"
       
-    - name: Run tests (TEMPORARILY SKIPPED - Testing build only)
+    - name: Run tests
       working-directory: ./pomodorotimertimertimer-app
-      continue-on-error: true
       run: |
-        echo "⚠️ Tests temporarily skipped to test build process"
-        echo "Running tests (non-blocking)..."
+        echo "Running tests..."
         mvn test || {
-          echo "❌ Tests failed (but continuing to check build)..."
-          echo "=== Checking test reports ==="
+          echo "❌ Tests failed!"
+          echo "=== Test Failure Details ==="
           if [ -d target/surefire-reports ]; then
-            echo "Test reports found:"
-            find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec head -30 {} \;
+            echo "=== All Test Reports ==="
+            find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec cat {} \;
+            echo ""
+            echo "=== Failed Test Summary ==="
+            find target/surefire-reports -name "*.txt" | while read file; do
+              if grep -q "FAILURE\|ERROR" "$file"; then
+                echo "Failed test: $file"
+                head -50 "$file"
+                echo "---"
+              fi
+            done
+          else
+            echo "No surefire-reports directory found"
           fi
-          echo "⚠️ Continuing despite test failures..."
+          exit 1
         }
-        echo "✅ Test step completed (may have failures)"
+        echo "✅ All tests passed!"
       
     - name: Generate JaCoCo coverage report
       working-directory: ./pomodorotimertimertimer-app
